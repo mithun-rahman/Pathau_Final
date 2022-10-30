@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 //let users = [];
 
 import mysql from 'mysql';
+import { response } from 'express';
 
 const con = mysql.createConnection({
     host: "localhost",
@@ -29,19 +30,8 @@ export const createUser = (req, res) => {
               id: uuidv4(),
         });    
    }
- );
+  );
    // res.send(`user with the name ${user.firstName} is added to database`);
-}
-
-export const getAll  = (req, res) => {
-    con.query("SELECT * FROM users", (error, data) => {
-        if (error) {
-          return res.json({ status: "ERROR", error });
-        }
-    
-        return res.json(data);
-    });
-   // res.send(users);
 }
 
 export const getUser = (req, res)  => {
@@ -51,21 +41,16 @@ export const getUser = (req, res)  => {
         [req.params.id],
         function (err, data) {
          
-          //  if(err) res.send("error")
+        if(err) {
+          return res.json({ status: "ERROR", err });
+        }
+        else {
             let id = data[0].id;
             let Name = data[0].firstName +data[0].lastName
             let phone = data[0].phone
             let person = {id:id, name: Name, phone:phone};
             res.send(person);
-        
-          /*
-          res.status(200).json({
-          //  status: "success",
-           
-            result: person,
-          });
-          */
-          
+        } 
 
         }
         
@@ -80,40 +65,70 @@ export const getUser = (req, res)  => {
     */
 
 }
+// today work (10/30/2022)
+/*
+i create a new data table for taglist and insert data when it hits POST /users/{id}/tags
+*/
+/*
+export const setTag = (req, res) => {
 
-export const deleteUser = (req, res) => {
-    /*
-    const {id} = req.params;
-    users = users.filter((users) => users.id != id);
-    res.send(`${id} is deleted from the database`);
-    */
-    con.query(
-        "DELETE FROM users WHERE id=?",
-        [req.params.id],
-        function (err, fields) {
-          if(err) res.send("error")
-          res.status(201).json({
-            status: "success",
-            message: "user deleted!",
-          });
-        }
+   //  console.log(req.body.tags);
+     const tagList = req.body.tags;
+     for(let tag of tagList) {
+          const values = [tag, req.params.id, req.body.expiry];
+          con.query(
+            "INSERT INTO taglist (tagName, id, expiry) VALUES(?)",
+            [values],
+            function (err, data, fields) {
+               // if(err) res.send("error") 
+                res.status(201).json({
+                  status: "success",
+              //  message: "a new user added",
+                  
+            });    
+       }
       );
+     }
+     res.send("successully added");
 }
-   
 
-export const updateUser = (req, res) => {
+// i could successfully able to work on POST /users/{id}/tags part
+/*
+This is my logic. some coding problem arise here.hope i will do it.
 
-    const data = [req.body.firstName, req.body.lastName, req.body.password, req.body.phone, req.params.id]
+export const gettagUsers  = (req, res) => {
 
-    con.query("UPDATE users SET firstName = ?, lastName = ?, password = ?, phone = ? where id = ?", data, (err, result) => {
+  tagList = req.body.tag;
+  const idList = new Set();
+
+  for(tag of tagList) {
+      con.query("Select Id, tag =?", tag, function(err, data, fields) {
+            idList.push(data.id);
+      })
+  }
+  finalResult = []
+  for(item of idList) {
+    con.query(
+        "SELECT * FROM users WHERE id = ?",
+        item,
+        function (err, data) {
+        
         if(err) {
-            res.send('error')
+          return res.json({ status: "ERROR", err });
         }
         else {
-            res.status(201).json({
-                status: "success",
-                message: "user updated"
-            });
-        }
-    });
+            let id = data[0].id;
+            let Name = data[0].firstName +data[0].lastName
+            let phone = data[0].phone
+            let person = {id:id, name: Name, phone:phone};
+            finalResult.push(person)
+        } 
+
+      }
+      
+    );
+    res.send(finalResult)
+  }
 }
+*/
+
