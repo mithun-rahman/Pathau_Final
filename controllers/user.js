@@ -69,7 +69,7 @@ export const getUser = (req, res)  => {
 /*
 i create a new data table for taglist and insert data when it hits POST /users/{id}/tags
 */
-/*
+
 export const setTag = (req, res) => {
 
    //  console.log(req.body.tags);
