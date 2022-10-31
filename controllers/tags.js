@@ -49,6 +49,7 @@ export const gettagUsers  =  (req, res) => {
                 "SELECT tagName FROM taglist WHERE id = ?",
                 data,
                 function (err, data) { 
+                    if(err) res.status(404).json({status:"not found"})
                     let tagset = new Set();
                     for(let tag of data) {
                         tagset.add(tag.tagName)
